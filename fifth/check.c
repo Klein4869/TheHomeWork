@@ -1,79 +1,94 @@
 #include <stdio.h>
+
+struct Brackets
+{
+    int line;
+    char b;
+    int is_out;
+};
+
 int main(int argc, char const *argv[])
 {
-    FILE *fp = fopen("example.c", "r");
-    char x;
-    char ans[2000] = {0};
-    char content[2000] = {0};
-    int bracket_before = 0, bracket_after = 0;
-    int Lbracket_before = 0, Lbracket_after = 0;
-    int up = 0;
-    int i = 0;
-    x = fgetc(fp);
+    FILE *fp = fopen("/Users/haidongtang/Desktop/数据结构/TheHomeWork/fifth/example1.c", "r");
+    char x[200];
+    struct Brackets b[200];
     int line = 0;
-    int last_line1, last_line2, last_line3, last_line4;
+    int is_inbracket = 0;
+    int t = 0;
     while (!feof(fp))
     {
-        if (x == '\n')
+        fgets(x, 200, fp);
+        line++;
+        int i = 0;
+        while (x[i] != '\0')
         {
-            line++;
+            if (x[i] == '"')
+            {
+                if (!is_inbracket)
+                {
+                    is_inbracket = 1;
+                }
+                else
+                {
+                    is_inbracket = 0;
+                }
+                i++;
+                continue;
+            }
+            if (is_inbracket)
+            {
+                i++;
+                continue;
+            }
+            if (x[i] == '/' && x[i + 1] == '/')
+            {
+                break;
+            }
+            if (x[i] == '{' || x[i] == '}' || x[i] == '(' || x[i] == ')')
+            {
+                b[t].is_out = 0;
+                b[t].b = x[i];
+                b[t++].line = line;
+                i++;
+                continue;
+            }
+            i++;
         }
-        if (x == '(')
-        {
-            ++bracket_before;
-            ans[up++] = '(';
-            last_line1 = line;
-        }
-        if (x == ')')
-        {
-            ++bracket_after;
-            ans[up++] = ')';
-            last_line2 = line;
-        }
-        if (x == '{')
-        {
-            ++Lbracket_before;
-            ans[up++] = '{';
-            last_line3 = line;
-        }
-        if (x == '}')
-        {
-            ++Lbracket_after;
-            ans[up++] = '}';
-            last_line4 = line;
-        }
-        x = fgetc(fp);
-        content[i++] = x;
     }
-    if (bracket_before != bracket_after || Lbracket_before != Lbracket_after)
+    int j, i, k;
+    for (j = 0; j < t; ++j)
     {
-        int last_line_tmp;
-        char y;
-        if (bracket_before > bracket_after)
+        printf("%c", b[j].b);
+        for (i = j + 1; i < t; ++i)
         {
-            last_line_tmp = last_line1;
-            y = '(';
+            if (b[j].is_out)
+            {
+                break;
+            }
+            if (b[i].is_out)
+            {
+                continue;
+            }
+            if (b[j].b == '(' && b[i].b == ')')
+            {
+                b[j].is_out = 1;
+                b[i].is_out = 1;
+                break;
+            }
+            if (b[j].b == '{' && b[i].b == '}')
+            {
+                b[j].is_out = 1;
+                b[i].is_out = 1;
+                break;
+            }
         }
-        else if (bracket_before < bracket_after)
-        {
-            last_line_tmp = last_line2;
-            y = ')';
-        }
-        else if (Lbracket_before > Lbracket_after)
-        {
-            last_line_tmp = last_line3;
-            y = '{';
-        }
-        else if (Lbracket_before > Lbracket_after)
-        {
-            last_line_tmp = last_line4;
-            y = '}';
-        }
-        printf("without matching '%c' at line %d\n", y, last_line_tmp);
     }
-    else
+    for (k = 0; k < t; ++k)
     {
-        printf("%s", ans);
+        if (!b[k].is_out)
+        {
+            printf("without matching '%c' at line %x\n", b[k].b, b[k].line);
+        }
     }
     fclose(fp);
     return 0;
