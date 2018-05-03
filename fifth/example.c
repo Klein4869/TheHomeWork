@@ -1,11 +1,9 @@
 #include <stdio.h>
 
 int main(){
-    FILE *fp = fopen("example.c", "r");
-    char x[200];
-    while(!feof(fp)){
-        fgets(x, 200, fp);
-        printf("%s", x);
+    int x;
+    while(scanf("%d", &x)!=EOF){
+        printf("%d\n", x);
     }
     return 0;
 }
