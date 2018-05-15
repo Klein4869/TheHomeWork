@@ -5,8 +5,8 @@
 struct family_tree {
     char name[30];
     int depth;
-    family_tree *left;
-    family_tree *right;
+    struct family_tree *left;
+    struct family_tree *right;
 };
 
 char name[5][30];
@@ -14,8 +14,9 @@ char name[5][30];
 int is_find = 0;
 int max;
 int flag = 1;
-int depth1, depth2, depth_former;
+struct family_tree f1, f2;
 char former_name1[30], former_name2[30];
+int former_depth1, former_depth2;
 
 void search_former(struct family_tree *h, char temp[], int x){
     if (is_find == 1){
@@ -25,9 +26,11 @@ void search_former(struct family_tree *h, char temp[], int x){
         if (!strcmp(h->left->name, temp)) {
             if (x == 1) {
                 strcpy(former_name1, h->name);
+                former_depth1 = h->depth;
             }
             if (x == 2) {
                 strcpy(former_name2, h->name);
+                former_depth2 = h->depth;
             }
             is_find = 1;
             return;
@@ -56,11 +59,13 @@ void search_former(struct family_tree *h, char temp[], int x){
 void search(struct family_tree *h, char temp1[], char temp2[], char former_name[]) {
     if (!strcmp(h->name, temp1)){
         strcpy(former_name1, former_name);
-        depth1 = h->depth;
+        strcpy(f1.name, h->name);
+        f1.depth = h->depth;
     }
     if (!strcmp(h->name, temp2)){
         strcpy(former_name2, former_name);
-        depth2 = h->depth;
+        strcpy(f2.name, h->name);
+        f2.depth = h->depth;
     }
     if (h->left != NULL)
         search(h->left, temp1, temp2, h->name);
@@ -110,7 +115,7 @@ int main() {
     int flag_1 = 0;
     fscanf(fp, "%d\n", &kided_number);
     int total = kided_number;
-    family_tree *h = (family_tree *) malloc(sizeof(family_tree));
+    struct family_tree *h = (struct family_tree *) malloc(sizeof(struct family_tree));
     strcpy(h->name, "NULL");
     h->depth = 0;
     while (kided_number--) {
@@ -118,7 +123,7 @@ int main() {
         char temp[200];
         char senpai[30];
         fgets(temp, 200, fp);
-        family_tree *f = (family_tree *) malloc(sizeof(family_tree));
+        struct family_tree *f = (struct family_tree *) malloc(sizeof(struct family_tree));
         int i = 0;
         int j = 0;
         int k = 0;
@@ -153,8 +158,8 @@ int main() {
         //        //
         max = k;
         strcpy(f->name, name[0]);
-        struct family_tree *f_left = (family_tree *) malloc(sizeof(family_tree));
-        struct family_tree *f_right = (family_tree *) malloc(sizeof(family_tree));
+        struct family_tree *f_left = (struct family_tree *) malloc(sizeof(struct family_tree));
+        struct family_tree *f_right = (struct family_tree *) malloc(sizeof(struct family_tree));
         if (max == 3) {
             if (!strcmp("NULL", name[2])) {
                 f->left = f_left;
@@ -180,18 +185,35 @@ int main() {
     char name2[30];
     scanf("%s %s", name1, name2);
     search(h ,name1, name2, " ");
-    if(depth1 == depth2){
+    if(f1.depth == f2.depth){
         if (!strcmp(former_name1, former_name2)){
             printf("%s %s 1\n", former_name1, name1);
             printf("%s %s 1\n", former_name1, name2);
             return 0;
         }
         while (strcmp(former_name1, former_name2)){
+            is_find = 0;
             search_former(h, former_name1, 1);
+            is_find = 0;
             search_former(h, former_name2, 2);
         }
-        printf("%s %s 1\n", former_name1, name1);
-        printf("%s %s 1\n", former_name1, name2);
+        printf("%s %s %d\n", former_name1, name1, former_depth1);
+        printf("%s %s %d\n", former_name1, name2, former_depth2);
     }
+    
+    if (f1.depth != f2.depth) {
+        
+        if (f1.depth > f2.depth) {
+            printf("%s %s %d\n", f1.name, f2.name, f1.depth-f2.depth);
+        }
+        
+        else
+        {
+            printf("%s %s %d\n", f2.name, f1.name, f2.depth-f1.depth);
+        }
+        
+        
+    }
+    
     return 0;
 }
