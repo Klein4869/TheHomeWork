@@ -5,12 +5,14 @@
 struct family_tree {
     char name[30];
     int depth;
+    int count;
     struct family_tree *left;
     struct family_tree *right;
 };
 
 char name[5][30];
 
+int counter=0;
 int is_find = 0;
 int max;
 int flag = 1;
@@ -61,11 +63,13 @@ void search(struct family_tree *h, char temp1[], char temp2[], char former_name[
         strcpy(former_name1, former_name);
         strcpy(f1.name, h->name);
         f1.depth = h->depth;
+        f1.count = h->count;
     }
     if (!strcmp(h->name, temp2)){
         strcpy(former_name2, former_name);
         strcpy(f2.name, h->name);
         f2.depth = h->depth;
+        f2.count = h->count;
     }
     if (h->left != NULL)
         search(h->left, temp1, temp2, h->name);
@@ -76,6 +80,7 @@ void search(struct family_tree *h, char temp1[], char temp2[], char former_name[
 void find(struct family_tree *node, char temp[], struct family_tree *f) {
     if (!strcmp(node->name, "NULL")) {
         strcpy(node->name, f->name);
+        node->count = counter++;
         node->left = f->left;
         if (node->left != NULL)
             node->left->depth = node->depth+1;
@@ -90,6 +95,7 @@ void find(struct family_tree *node, char temp[], struct family_tree *f) {
     if (!strcmp(node->name, temp)) {
         is_find = 1;
         strcpy(node->name, f->name);
+        node->count = counter++;
         node->left = f->left;
         if (node->left != NULL)
             node->left->depth = node->depth+1;
@@ -109,7 +115,7 @@ void find(struct family_tree *node, char temp[], struct family_tree *f) {
 }
 
 int main() {
-    char file_in_name[] = "C:\\Users\\Administrator\\CLionProjects\\ForHomework\\in.txt";
+    char file_in_name[] = "in.txt";
     FILE *fp = fopen(file_in_name, "r");
     int kided_number;
     int flag_1 = 0;
@@ -118,6 +124,7 @@ int main() {
     struct family_tree *h = (struct family_tree *) malloc(sizeof(struct family_tree));
     strcpy(h->name, "NULL");
     h->depth = 0;
+    //创建树
     while (kided_number--) {
         int is_first = 1;
         char temp[200];
@@ -163,11 +170,14 @@ int main() {
         if (max == 3) {
             if (!strcmp("NULL", name[2])) {
                 f->left = f_left;
+                f->left->count = counter++;
                 f->right = NULL;
                 strcpy(f_left->name, name[1]);
             } else {
                 f->left = f_left;
                 f->right = f_right;
+                f->left->count = counter++;
+                f->right->count = counter++;
                 strcpy(f_left->name, name[1]);
                 strcpy(f_right->name, name[2]);
             }
@@ -181,6 +191,8 @@ int main() {
         int x = 2;
     }
     fclose(fp);
+    //
+    //搜索人名，并输出
     char name1[30];
     char name2[30];
     scanf("%s %s", name1, name2);
@@ -197,23 +209,28 @@ int main() {
             is_find = 0;
             search_former(h, former_name2, 2);
         }
-        printf("%s %s %d\n", former_name1, name1, former_depth1);
-        printf("%s %s %d\n", former_name1, name2, former_depth2);
+        if (f1.count < f2.count) {
+            printf("%s %s %d\n", former_name1, f1.name, f1.depth - former_depth1);
+            printf("%s %s %d\n", former_name1, f2.name, f2.depth - former_depth1);
+        } else{
+            printf("%s %s %d\n", former_name1, f2.name, f2.depth - former_depth1);
+            printf("%s %s %d\n", former_name1, f1.name, f1.depth - former_depth1);
+        }
     }
-    
+
     if (f1.depth != f2.depth) {
-        
+
         if (f1.depth > f2.depth) {
             printf("%s %s %d\n", f1.name, f2.name, f1.depth-f2.depth);
         }
-        
+
         else
         {
             printf("%s %s %d\n", f2.name, f1.name, f2.depth-f1.depth);
         }
-        
-        
+
+
     }
-    
+
     return 0;
 }
