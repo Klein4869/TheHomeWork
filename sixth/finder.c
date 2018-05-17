@@ -1,3 +1,7 @@
+//
+// Created by Administrator on 2018/5/15.
+//
+
 #include "stdlib.h"
 #include "stdio.h"
 #include "string.h"
@@ -82,11 +86,15 @@ void find(struct family_tree *node, char temp[], struct family_tree *f) {
         strcpy(node->name, f->name);
         node->count = counter++;
         node->left = f->left;
-        if (node->left != NULL)
-            node->left->depth = node->depth+1;
+        if (node->left != NULL) {
+            node->left->depth = node->depth + 1;
+            node->left->count = counter++;
+        }
         node->right = f->right;
-        if (node->right != NULL)
-            node->right->depth = node->depth+1;
+        if (node->right != NULL) {
+            node->right->depth = node->depth + 1;
+            node->right->count = counter++;
+        }
         return;
     }
     if (is_find == 1) {
@@ -95,13 +103,17 @@ void find(struct family_tree *node, char temp[], struct family_tree *f) {
     if (!strcmp(node->name, temp)) {
         is_find = 1;
         strcpy(node->name, f->name);
-        node->count = counter++;
+//        node->count = counter++;
         node->left = f->left;
-        if (node->left != NULL)
-            node->left->depth = node->depth+1;
+        if (node->left != NULL) {
+            node->left->depth = node->depth + 1;
+            node->left->count = counter++;
+        }
         node->right = f->right;
-        if (node->right != NULL)
-            node->right->depth = node->depth+1;
+        if (node->right != NULL) {
+            node->right->depth = node->depth + 1;
+            node->right->count = counter++;
+        }
         return;
     } else {
         if (node->left != NULL)
@@ -124,7 +136,6 @@ int main() {
     struct family_tree *h = (struct family_tree *) malloc(sizeof(struct family_tree));
     strcpy(h->name, "NULL");
     h->depth = 0;
-    //创建树
     while (kided_number--) {
         int is_first = 1;
         char temp[200];
@@ -191,16 +202,19 @@ int main() {
         int x = 2;
     }
     fclose(fp);
-    //
-    //搜索人名，并输出
     char name1[30];
     char name2[30];
     scanf("%s %s", name1, name2);
     search(h ,name1, name2, " ");
     if(f1.depth == f2.depth){
         if (!strcmp(former_name1, former_name2)){
-            printf("%s %s 1\n", former_name1, name1);
-            printf("%s %s 1\n", former_name1, name2);
+            if (f1.count < f2.count) {
+                printf("%s %s %d\n", former_name1, f1.name, f1.depth - former_depth1);
+                printf("%s %s %d\n", former_name1, f2.name, f2.depth - former_depth1);
+            } else{
+                printf("%s %s %d\n", former_name1, f2.name, f2.depth - former_depth1);
+                printf("%s %s %d\n", former_name1, f1.name, f1.depth - former_depth1);
+            }
             return 0;
         }
         while (strcmp(former_name1, former_name2)){
