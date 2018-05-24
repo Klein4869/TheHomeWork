@@ -96,15 +96,8 @@ int main(int argc, char const *argv[])
             index_1 = t[index_1].index;
             index_2 = t[index_2].index;
         }
-        if (order == 0)
-        {
-            printf("%s %s %d\n", t[index_1].name, name_1, level_1 - t[index_1].level);
-            printf("%s %s %d\n", t[index_1].name, name_2, level_1 - t[index_1].level);
-        }
-        else{
-            printf("%s %s %d\n", t[index_1].name, name_2, level_1 - t[index_1].level);
-            printf("%s %s %d\n", t[index_1].name, name_1, level_1 - t[index_1].level);
-        }
+        printf("%s %s %d\n", t[index_1].name, name_1, level_1 - t[index_1].level);
+        printf("%s %s %d\n", t[index_1].name, name_2, level_1 - t[index_1].level);
     }
     else{
         int level = level_1 - level_2;
