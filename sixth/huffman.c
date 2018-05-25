@@ -1,26 +1,28 @@
 #include "stdio.h"
 #include "string.h"
+#include "stdlib.h"
 
-struct word
+struct wordtree
 {
     char word;
     int num;
-    int index;
+    struct wordtree *left;
+    struct wordtree *right;
 };
 
-void qc(struct word *a, int left, int right){
+void qc(struct wordtree **a, int left, int right){
     if (left - right <=0)
     {
         return;
     }
     int i = left;
     int j = right;
-    struct word key = a[0];
+    struct wordtree *key = a[0];
     while(i < j){
-        while(i < j && a[j].num >= key.num)
+        while(a[j] == NULL || (i < j && a[j]->num >= key->num))
             j--;
         a[i] = a[j];
-        while(i < j && a[i].num <= key.num)
+        while(a[i] == NULL || (i < j && a[i]->num <= key->num))
             i++;
         a[j] = a[i];
     }
@@ -33,40 +35,40 @@ int main(int argc, char const *argv[])
 {
     int i,  counter = 0, j = 0;
     int num[1000] = {0};
-    struct word words[1000];
+    num[0] = 1;
+    char words1[100];
+    int words[100];
     FILE *fp = fopen("/Users/haidongtang/Desktop/in.txt", "r");
     char c;
     while(!feof(fp)){
         c = fgetc(fp);
         num[c]++;
     }
-    for (i = 0; i < 1000; ++i){
-        words[i].index = -1;
-        words[i].num = 0;
-    }
-    for (i = 0; i < 1000; ++i) {
-        if(num[i] != 0){
-            words[counter].word = i;
-            words[counter++].num = num[i];
-        }
-    }
-    qc(words, 0, counter-1);
-    while(j != 1){
-        for (i = 0, j = 2; i < counter; ++i)
+    for (i = 0; i < 1000; ++i)
+    {
+        if (num[i]!=0)
         {
-            if (j == 0)
-                break;
-            if (words[i].index == -1)
-            {
-                words[counter].num += words[i].num;
-                j--;
-                words[i].index = counter;
-            }
+            words[counter] = num[i];
+            words1[counter++] = i;
         }
-        counter++;
-        qc(words, 0, counter-1);
     }
-    counter--;
-    printf("helloworld\n");
-    return 0;
+    struct wordtree **w = (struct wordtree **)malloc(counter*sizeof(struct wordtree));
+    struct wordtree *head;
+    for (i = 0; i < counter; ++i)
+    {
+        w[i]->word = words1[i];
+        w[i]->left = NULL;
+        w[i]->right = NULL;
+    }
+    qc(w, 0, counter-1);
+    for (int i = 0; i < counter; ++i)
+    {
+        head = malloc(sizeof(struct wordtree));
+        head->left = w[0];
+        head->right = w[1];
+        head->num = w[0]->num + w[1]->num;
+        w[0] = head;
+        w[1] = NULL;
+    }
+    free(w);
 }
