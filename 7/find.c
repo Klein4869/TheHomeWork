@@ -6,41 +6,33 @@ int time = 0;
 
 char words[3600][30];
 
-void bisearch(int first, int last, char *b){
-    if(is_find){
-        return;
-    }
-    if (last == first){
-        time++;
-        if (!strcmp(words[first], b)){
-            printf("1 %d", time);
-            is_find = 1;
-            return;
-        } else{
-            printf("0 %d", time);
-            is_find = 1;
-            return;
-        }
-    }
-    int mid = (first+last)/2;
+int bisearch(int first, int last, char *b){
+    if(first > last)
+        return -1;
+    int mid = first + (last - first)/2;
     time++;
-    if (!strcmp(words[mid], b)){
-        printf("1 %d", time);
-        is_find = 1;
-        return;
-    }else{
-        if(strcmp(words[mid], b) > 0)
-            bisearch(first, mid-1, b);
-        else
-            bisearch(mid+1, last, b);
-    }
+    if(strcmp(words[mid], b) > 0)
+        return bisearch(first, mid-1, b);
+    else if(strcmp(words[mid], b) < 0)
+        return bisearch(mid+1, last, b);
+    else
+        return mid;
 }
 
 int main() {
     int count = 0, i, compare_num = 0;
+    int first[26];
+    int last[26];
     FILE *fp = fopen("/Users/haidongtang/ctest/cmake-build-debug/dictionary3500.txt", "r");
-    while (!feof(fp))
+    char temp = '0';
+    while (!feof(fp)) {
         fscanf(fp, "%s", words[count++]);
+        if (words[count - 1] != temp){
+            first[(int)(words[count-1] - 'a')] = count - 1;
+            last[temp - 'a'] = count - 2;
+        }
+        temp = words[count - 1];
+    }
     char word[30];
     scanf("%s", word);
     char method;
@@ -62,11 +54,17 @@ int main() {
             printf("0 %d", compare_num);
     }
     if (method == '2'){
-        bisearch(0, count, word);
-        if(!is_find){
+        int ans = bisearch(0, count, word);
+        if(ans == -1){
             printf("0 %d", time);
+        } else{
+            printf("1 %d", time);
         }
     }
+    if (method == '3'){
+        
+    }
 }
+
 
 
