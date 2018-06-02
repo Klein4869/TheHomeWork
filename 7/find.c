@@ -22,7 +22,7 @@ void bisearch(int first, int last, char *b){
             return;
         }
     }
-    int mid = (first+last)/2;
+    int mid = (first+last)/2 + 1;
     time++;
     if (!strcmp(words[mid], b)){
         printf("1 %d", time);
