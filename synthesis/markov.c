@@ -1,80 +1,101 @@
-#include <string.h>
+#include "string.h"
 #include "stdio.h"
-#include "search.cpp"
+#include "stdlib.h"
 
-struct dir
+char input[5000000];
+char *word[100000];
+int wordNum = 0;
+int k = 2;
+int next[100000];
+int bin[50000];
+
+unsigned int hash(char *str)
 {
-    int length;
-    char words[10][30];
-    char word1[30];
-    char word2[30];
-};
+    int n;
+    unsigned int h = 0;
+    char *p = str;
+    for (n = k; n > 0; ++p)
+    {
+        h = 31 * h + *p;
 
-int count=0;
-struct dir markovs[1000001];
-
-int find_word(char tmp){    //确认是否是单词
-    if (tmp >= 'a' && tmp <= 'z'){
-        return 1;
-    }
-    if (tmp >= 'A' && tmp <= 'Z'){
-        return 1;
-    }
-    return 0;
-}
-
-int duplicate_check(){  //重复检测函数
-    int i;
-    for (i = 0; i < count-1; ++i) {
-        if (!(strcmp(markovs[count-1].word1, markovs[i].word1) || strcmp(markovs[count-1].word2, markovs[i].word2))){
-            return 1;
+        if (*p == '\0')
+        {
+            --n;
         }
     }
-    return 0;
+    return h % 50000;
+}
+
+int wordCmp(char *p, char *q)
+{
+    int i;
+
+    for (i = k; *p == *q; p++, q++)
+        if (*p == '\0' && (--i) == 0)
+            return 0;
+
+    return *p - *q;
+}
+
+char *skip(char *p, int n)
+{
+    for (; n > 0; p++)
+        if (*p == '\0')
+            --n;
+    return p;
 }
 
 int main(int argc, char const *argv[])
 {
-    char temp[2000];
-    FILE* fp = fopen("article.txt", "r");
-    while(!feof(fp)){
-        fgets(temp, 2000, fp);
-        int i=0;
-        int j;
-        int k;
-        char tmp[30];
-        int flag = 0;
-        int is_first = 1;
-        while(temp[i] != '\0'){
-            if (find_word(temp[i])){
-                tmp[j++] = temp[i];
+    int i, j;
+    word[0] = input;
+
+    FILE *fp = fopen("article.txt", "r");
+
+    while (!feof(fp))
+    {
+        fscanf(fp, "%s", word[wordNum]);
+        word[wordNum + 1] = word[wordNum] + strlen(word[wordNum]) + 1;
+        wordNum++;
+    }
+    for (i = 0; i < 50000; i++)
+        bin[i] = -1;
+    for (i = 0; i < wordNum - k; i++)
+    {
+        j = hash(word[i]);
+        next[i] = bin[j];
+        bin[j] = i;
+    }
+
+    int wordsleft;
+    int psofar;
+    char *phrase, *p;
+    phrase = input;
+
+    FILE *fp1 = fopen("markov.txt", "a+");
+
+    fprintf(fp1, "%s %s ", skip(phrase, 0), skip(phrase, 1));
+
+    for (wordsleft = 1000000; wordsleft > 0; --wordsleft)
+    {
+        psofar = 0;
+
+        for (j = bin[hash(phrase)]; j >= 0; j = next[j])
+        {
+
+            if (wordCmp(phrase, word[j]) == 0 && rand() % ++psofar == 0)
+            {
+                p = word[j];
             }
-            if (temp[i] == ' '){
-                tmp[j++] = '\0';
-                j = 0;
-                if (flag == 0) {
-                    strcpy(markovs[count].word1, tmp);
-                    flag = 1;
-//                    i++;
-//                    continue;
-                }
-                else if (flag == 1){
-                    if (!is_first){         //检查是不是第一次遇到第二个
-                        markovs[count].length++;
-                        strcpy(markovs[count].words[k++], tmp);
-                    }
-                    strcpy(markovs[count++].word2, tmp);
-                    if (!duplicate_check()) {       //检查是否重复
-                        strcpy(markovs[count].word1, markovs[count - 1].word2);
-                    } else{
-                        count--;
-                        strcpy(markovs[count].word1, markovs[count].word2);
-                    }
-                    is_first = 0;
-                }
+            phrase = skip(p, 1);
+
+            if (strlen(skip(phrase, k - 1)) == 0)
+            {
+                break;
             }
-            i++;
+            fprintf(fp1, "%s ", skip(phrase, k - 1));
         }
     }
+
     return 0;
 }
