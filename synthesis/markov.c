@@ -75,7 +75,7 @@ int main(int argc, char const *argv[])
     FILE *fp1 = fopen("markov.txt", "a+");
 
     fprintf(fp1, "%s %s ", skip(phrase, 0), skip(phrase, 1));
-
+    
     for (wordsleft = 1000000; wordsleft > 0; --wordsleft)
     {
         psofar = 0;
